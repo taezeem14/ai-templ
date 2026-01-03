@@ -24,7 +24,7 @@ export async function handler(event) {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model: "deepseek/deepseek-r1-0528:free",
+          model: "moonshotai/kimi-k2:free",
           messages: [
             {
               role: "system",
@@ -66,4 +66,5 @@ Rules:
     };
   }
 }
+
 
