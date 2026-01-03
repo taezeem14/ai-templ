@@ -29,9 +29,15 @@ body.dark {
   --bot: #0f172a;     /* Bot message background inside chat panel */
   --text: #e5e7eb;
   --muted: #94a3b8;
+  
+  body.dark a:hover {
+  color: #4ade80; /* lighter green on hover */
 }
 
-
+  body.dark a {
+  color: #22c55e; /* bright green */
+  text-decoration: underline;
+  }
 body{
   font-family:system-ui,sans-serif;
   background:var(--bg);
@@ -275,4 +281,5 @@ input.addEventListener("keydown",e=>{
 
 </body>
 </html>
+
 
