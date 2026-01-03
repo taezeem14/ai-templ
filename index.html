@@ -142,6 +142,34 @@ button.send{
 
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes fadeIn{to{opacity:1;}}
+
+  /* ===== CUSTOM SCROLLBAR ===== */
+#chat::-webkit-scrollbar {
+  width: 8px;
+}
+#chat::-webkit-scrollbar-track {
+  background: var(--panel);
+  border-radius: 8px;
+}
+#chat::-webkit-scrollbar-thumb {
+  background-color: var(--user);
+  border-radius: 8px;
+  border: 2px solid var(--panel);
+}
+body.dark #chat::-webkit-scrollbar-thumb {
+  background-color: #2563eb; /* nice blue for dark mode */
+  border: 2px solid #0f172a;
+}
+
+/* ===== BULLET POINTS INSIDE CHAT BOX ===== */
+.msg ul, .msg ol {
+  padding-left: 20px; /* space for bullets */
+  margin: 8px 0;      /* spacing between lists and text */
+}
+.msg li {
+  margin-bottom: 4px; /* spacing between items */
+}
+
 </style>
 </head>
 
@@ -282,3 +310,4 @@ input.addEventListener("keydown",e=>{
 
 </body>
 </html>
+
