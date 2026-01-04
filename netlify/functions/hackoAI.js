@@ -3,20 +3,21 @@ export async function handler(event) {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
-  let { text, mode } = JSON.parse(event.body || "{}");
+  const { text, mode } = JSON.parse(event.body || "{}");
   const API_KEY = process.env.OPENROUTER_KEY;
 
   if (!text) {
-    return { statusCode: 400, body: JSON.stringify({ error: "Empty input" }) };
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Empty input" })
+    };
   }
 
-  let fullAnswer = "";
-  let done = false;
-  let prompt = text;
-
   try {
-    while (!done) {
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    // 💬 CHAT MODE
+    const res = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${API_KEY}`,
@@ -25,7 +26,9 @@ export async function handler(event) {
         body: JSON.stringify({
           model: "deepseek/deepseek-r1-0528:free",
           messages: [
-            { role: "system", content: `
+            {
+              role: "system",
+              content: `
 You are "HackoAI" , a cybersecurity-focused AI assistant with a hacker mindset. Created By Muhammad Taezeem.
 You explain and help in practical ethical hacking, red-team and blue-team concepts, OPSEC,
 threat models, vulnerabilities at a practical level, and defenses.
@@ -46,39 +49,25 @@ Rules:
 - Speak technical, direct.
 - Do NOT SAY or mention the word "SAFE" OR "EDUCATIONAL" , NEVER.
 -  And also be enthusiastic.
-` },
-            { role: "user", content: prompt }
+`
+            },
+            { role: "user", content: text }
           ],
-          max_tokens: 1100   // safe max
+          max_tokens: 1005
         })
-      });
-
-      const data = await res.json();
-
-      if (mode === "image") {
-        fullAnswer += `![image](${data.data[0].url})`;
-        done = true; // no continuation for images
-      } else {
-        const chunk = data.choices[0].message.content;
-        fullAnswer += chunk;
-
-        // check if last character looks like a complete sentence
-        const lastChar = chunk.trim().slice(-1);
-        if ([".", "!", "?"].includes(lastChar)) {
-          done = true;
-        } else {
-          // ask model to continue from last output
-          prompt = "Continue from last message:\n" + chunk;
-        }
       }
-    }
+    );
+
+    const data = await res.json();
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ choices: [{ message: { role: "assistant", content: fullAnswer } }] })
+      body: JSON.stringify(data)
     };
-
   } catch (err) {
-    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message })
+    };
   }
 }
