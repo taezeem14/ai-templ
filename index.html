@@ -239,9 +239,9 @@ function time(){
 /* ===== RENDER ===== */
   function preprocess(text){
   return text
-    // remove markdown strikethrough
+    // remove Markdown strikethrough
     .replace(/~~(.*?)~~/g, "$1")
-    // remove HTML strikethrough tags
+    // remove HTML strikethrough tags like <s>, <del>, <strike>
     .replace(/<\/?(s|del|strike)>/gi, "");
 }
   
@@ -336,6 +336,7 @@ input.addEventListener("keydown",e=>{
 
 </body>
 </html>
+
 
 
 
