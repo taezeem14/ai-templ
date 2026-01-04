@@ -14,19 +14,6 @@ export async function handler(event) {
   }
 
   try {
-    if (mode.value === "image" && data.data && data.data[0]) {
-  chunk = `![image](${data.data[0].url})`;
-  fullAnswer += chunk;
-  continueLoop = false;
-} else {
-  chunk = data.choices[0].message.content;
-  fullAnswer += chunk;
-}
-
-  const data = await res.json();
-  return { statusCode: 200, body: JSON.stringify(data) };
-}
-
     // 💬 CHAT MODE
     const res = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
@@ -84,5 +71,6 @@ Rules:
     };
   }
 }
+
 
 
