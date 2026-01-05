@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>HackoAI • Neural Interface</title>
+<title>HackoAI • Chat Interface</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Smooch+Sans:wght@300..800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Smooch+Sans:wght@100..900&display=swap" rel="stylesheet">
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
@@ -14,13 +15,21 @@
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
+
+/* ===== THEME ===== */
 :root{
-  --bg:#020617;--panel:#0f172a;--chat:#1e293b;
-  --border:#1f2937;--user:#2563eb;--bot:#020617;
-  --text:#e5e7eb;--muted:#94a3b8;
+  --bg:#f4f4f5; --panel:#fff; --chat:#f9fafb;
+  --border:#e5e7eb; --user:#2563eb; --bot:#e5e7eb;
+  --text:#111827; --muted:#6b7280; --link:#2563eb;
 }
+body.dark{
+  --bg:#020617; --panel:#0f172a; --chat:#1e293b;
+  --border:#1f2937; --user:#2563eb; --bot:#0f172a;
+  --text:#e5e7eb; --muted:#94a3b8; --link:#22c55e;
+}
+
 body{
-  font-family:system-ui;
+  font-family:system-ui,sans-serif;
   background:var(--bg);
   height:100vh;
   display:flex;
@@ -28,97 +37,147 @@ body{
   align-items:center;
   color:var(--text);
 }
+
 .app{
-  width:100%;max-width:700px;height:92vh;
+  width:100%;
+  max-width:650px;
+  height:90vh;
   background:var(--panel);
-  border-radius:16px;
-  display:flex;flex-direction:column;
-  box-shadow:0 30px 60px rgba(0,0,0,.6);
+  border-radius:14px;
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 20px 40px rgba(0,0,0,.3);
   overflow:hidden;
 }
+
 header{
   padding:14px 16px;
   border-bottom:1px solid var(--border);
-  display:flex;justify-content:space-between;align-items:center;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
   font-weight:600;
 }
+
 .controls{display:flex;gap:8px}
-select,button{
-  background:transparent;border:1px solid var(--border);
-  color:var(--text);padding:6px 10px;
-  border-radius:8px;cursor:pointer;
+button.toggle, select{
+  background:transparent;
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:6px 10px;
+  border-radius:8px;
+  cursor:pointer;
 }
+
+/* ===== CHAT ===== */
 #chat{
-  flex:1;padding:16px;overflow-y:auto;
-  display:flex;flex-direction:column;gap:14px;
+  flex:1;
+  padding:16px;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
   background:var(--chat);
 }
+
 .msg{
   max-width:85%;
   padding:12px 14px;
   border-radius:12px;
   line-height:1.5;
-  animation:fade .2s forwards;
+  animation:fadeIn .25s forwards;
   word-wrap:break-word;
 }
+
 .user{align-self:flex-end;background:var(--user);color:#fff}
 .bot{align-self:flex-start;background:var(--bot)}
-.timestamp{font-size:10px;color:var(--muted);margin-top:4px}
+
+.timestamp{
+  font-size:10px;
+  color:var(--muted);
+  margin-top:6px;
+}
+
+/* ===== CODE ===== */
 pre{
-  background:#020617;padding:12px;border-radius:10px;
-  margin-top:8px;position:relative;overflow-x:auto;
+  position:relative;
+  background:#020617;
+  border-radius:10px;
+  padding:12px;
+  margin-top:8px;
+  overflow-x:auto;
 }
 .copy-btn{
-  position:absolute;top:6px;right:6px;
-  font-size:11px;background:#2563eb;color:#fff;
-  border:none;border-radius:6px;padding:4px 8px;
+  position:absolute;
+  top:6px;right:6px;
+  background:#2563eb;
+  border:none;
+  color:#fff;
+  font-size:11px;
+  padding:4px 8px;
+  border-radius:6px;
+  cursor:pointer;
 }
+
+/* ===== FOOTER ===== */
 footer{
-  display:flex;gap:8px;padding:12px;
+  display:flex;
+  gap:8px;
+  padding:12px;
   border-top:1px solid var(--border);
 }
-textarea{
-  flex:1;resize:none;max-height:120px;
-  padding:12px;border-radius:8px;
+
+input{
+  flex:1;
+  padding:12px;
+  border-radius:8px;
   border:1px solid var(--border);
-  background:transparent;color:var(--text);
+  background:transparent;
+  color:var(--text);
+  outline:none;
 }
-.send{
-  background:#2563eb;border:none;color:#fff;
-  padding:0 18px;border-radius:8px;font-weight:600;
+
+button.send{
+  padding:0 18px;
+  border-radius:8px;
+  border:none;
+  background:#2563eb;
+  color:#fff;
+  font-weight:600;
 }
-.typing{
-  font-size:12px;color:var(--muted);
-  padding-left:6px;
-}
-@keyframes fade{from{opacity:0}to{opacity:1}}
+
+/* ===== LOADER ===== */
 .spinner{
-  width:16px;height:16px;border:3px solid var(--border);
-  border-top:3px solid #2563eb;border-radius:50%;
+  width:18px;height:18px;
+  border:3px solid var(--border);
+  border-top:3px solid #2563eb;
+  border-radius:50%;
   animation:spin 1s linear infinite;
 }
+
 @keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeIn{to{opacity:1}}
 </style>
 </head>
 
-<body>
+<body class="dark">
+
 <div class="app">
 <header>
   HackoAI
   <div class="controls">
-    <select id="model">
-      <option value="auto">Auto</option>
-      <option value="fast">Fast</option>
-      <option value="reasoning">Reasoning</option>
+    <select id="mode">
+      <option value="chat">Chat</option>
     </select>
-    <button onclick="clearChat()">🗑️</button>
+    <button class="toggle" onclick="clearChat()">🗑️</button>
+    <button class="toggle" onclick="toggleTheme()">🌗</button>
   </div>
 </header>
 
 <div id="chat"></div>
 
 <footer>
-  <textarea id="input" rows="1" placeholder="Drop a thought…"></textarea>
+  <input id="input" placeholder="Type a message…" />
   <button class="send" onclick="send()">Send</button>
 </footer>
 </div>
@@ -126,30 +185,38 @@ textarea{
 <script>
 const chat=document.getElementById("chat");
 const input=document.getElementById("input");
-const model=document.getElementById("model");
-const KEY="hackoai_chat";
+const THEME_KEY="hackoai_theme";
 
-let history=JSON.parse(localStorage.getItem(KEY)||"[]");
-history.forEach(m=>render(m.role,m.content,false));
-
-function save(role,content){
-  history.push({role,content});
-  localStorage.setItem(KEY,JSON.stringify(history));
+/* ===== THEME ===== */
+if(localStorage.getItem(THEME_KEY)==="light"){
+  document.body.classList.remove("dark");
+}
+function toggleTheme(){
+  document.body.classList.toggle("dark");
+  localStorage.setItem(
+    THEME_KEY,
+    document.body.classList.contains("dark")?"dark":"light"
+  );
 }
 
+/* ===== UTILS ===== */
 function time(){
   const d=new Date();
-  return d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  return d.getHours().toString().padStart(2,'0')+":"+
+         d.getMinutes().toString().padStart(2,'0');
 }
 
-function sanitize(t){
-  return t.replace(/<script.*?>.*?<\/script>/gi,"");
+function preprocess(t){
+  return t.replace(/~~(.*?)~~/g,"$1")
+          .replace(/<\/?(s|del|strike)>/gi,"");
 }
 
-function render(role,content,saveIt=true){
+/* ===== RENDER ===== */
+function render(role,content){
   const d=document.createElement("div");
   d.className="msg "+role;
-  d.innerHTML=marked.parse(sanitize(content));
+  d.innerHTML=marked.parse(preprocess(content));
+
   d.querySelectorAll("pre code").forEach(b=>{
     hljs.highlightElement(b);
     const btn=document.createElement("button");
@@ -162,60 +229,69 @@ function render(role,content,saveIt=true){
     };
     b.parentElement.appendChild(btn);
   });
+
   const t=document.createElement("div");
-  t.className="timestamp";t.textContent=time();
+  t.className="timestamp";
+  t.textContent=time();
   d.appendChild(t);
+
   chat.appendChild(d);
   chat.scrollTop=chat.scrollHeight;
-  if(saveIt) save(role,content);
+  return d;
 }
 
-function clearChat(){
-  if(!confirm("Nuke the convo? 💀"))return;
-  history=[];localStorage.removeItem(KEY);
-  chat.innerHTML="";
-  render("bot","Fresh boot. Neural stack online ⚡");
+/* ===== TYPEWRITER ===== */
+function streamBot(text){
+  const d=document.createElement("div");
+  d.className="msg bot";
+  chat.appendChild(d);
+
+  let i=0;
+  const interval=setInterval(()=>{
+    d.innerHTML=marked.parse(preprocess(text.slice(0,i++)));
+    chat.scrollTop=chat.scrollHeight;
+    if(i>text.length){
+      clearInterval(interval);
+      d.remove();
+      render("bot",text);
+    }
+  },15);
 }
 
-input.addEventListener("input",()=>{
-  input.style.height="auto";
-  input.style.height=input.scrollHeight+"px";
-});
-
+/* ===== SEND ===== */
 async function send(){
   const text=input.value.trim();
   if(!text)return;
-  input.value="";input.style.height="auto";
+  input.value="";
   render("user",text);
 
-  const typing=document.createElement("div");
-  typing.className="typing";
-  typing.innerHTML="<div class='spinner'></div> AI thinking…";
-  chat.appendChild(typing);
+  const loading=render("bot","<div class='spinner'></div>");
 
   try{
     const res=await fetch("/.netlify/functions/hackoAI",{
       method:"POST",
       headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify({ text, model:model.value })
+      body:JSON.stringify({ text })
     });
     const data=await res.json();
-    typing.remove();
+    loading.remove();
+
     const answer=data?.choices?.[0]?.message?.content;
-    if(!answer) throw 0;
-    render("bot",answer);
+    if(!answer){
+      render("bot","💀 Empty response");
+      return;
+    }
+    streamBot(answer);
   }catch{
-    typing.remove();
-    render("bot","Server folded 💀 Retry?");
+    loading.remove();
+    render("bot","Network error 💀");
   }
 }
 
 input.addEventListener("keydown",e=>{
-  if(e.key==="Enter"&&!e.shiftKey){
-    e.preventDefault();send();
-  }
+  if(e.key==="Enter") send();
 });
 </script>
+
 </body>
 </html>
-
