@@ -321,6 +321,26 @@ body.dark #chat::-webkit-scrollbar-thumb {background-color: #2563eb;border: 2px 
 
 .hidden{display:none;}
 
+  .menu-close-btn {
+  display: none; /* hidden on desktop */
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 25;
+}
+
+@media(max-width:768px){
+  .menu-close-btn {
+    display: block;
+  }
+}
+
 /* ===== MOBILE ===== */
 @media(max-width:768px){
   .sidebar {
@@ -347,6 +367,7 @@ body.dark #chat::-webkit-scrollbar-thumb {background-color: #2563eb;border: 2px 
 <div class="container">
   <!-- SIDEBAR -->
   <div class="sidebar" id="sidebar">
+    <button class="menu-close-btn" onclick="toggleSidebar()">✕</button>
     <div class="sidebar-header">
       <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search chats...">
       <div class="sidebar-controls">
@@ -949,4 +970,5 @@ updateHeaderTitle();
 
 </body>
 </html>
+
 
