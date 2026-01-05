@@ -444,39 +444,85 @@ const charCounter=document.getElementById("charCounter");
 const headerTitle=document.getElementById("headerTitle");
 
 /* ===== SESSION MANAGEMENT ===== */
-const SESSIONS_KEY="hackoai_sessions";
-const CURRENT_KEY="hackoai_current";
+/* ===== STORAGE HELPERS ===== */
+const SESSIONS_KEY = "hackoai_sessions";
+const CURRENT_KEY = "hackoai_current";
 
-let sessions=JSON.parse(localStorage.getItem(SESSIONS_KEY)||"{}");
-let currentId=localStorage.getItem(CURRENT_KEY)||null;
+let sessions = loadSessions();
+let currentId = localStorage.getItem(CURRENT_KEY) || null;
 
-if(!currentId||!sessions[currentId]){
-  currentId=Date.now().toString();
-  sessions[currentId]={
-    id:currentId,
-    title:"New Chat",
-    messages:[],
-    timestamp:Date.now(),
-    pinned:false
-  };
-  saveSessions();
+function loadSessions() {
+  try {
+    return JSON.parse(localStorage.getItem(SESSIONS_KEY)) || {};
+  } catch {
+    localStorage.removeItem(SESSIONS_KEY);
+    return {};
+  }
 }
 
-function saveSessions(){
-  localStorage.setItem(SESSIONS_KEY,JSON.stringify(sessions));
-  localStorage.setItem(CURRENT_KEY,currentId);
+function saveSessions() {
+  // always make sure current session exists
+  if (!sessions[currentId]) {
+    const ids = Object.keys(sessions);
+    currentId = ids.length ? ids[0] : Date.now().toString();
+    if (!sessions[currentId]) {
+      sessions[currentId] = {
+        id: currentId,
+        title: "New Chat",
+        messages: [],
+        timestamp: Date.now(),
+        pinned: false
+      };
+    }
+  }
+
+  localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
+  localStorage.setItem(CURRENT_KEY, currentId);
   renderHistory();
   updateHeaderTitle();
 }
 
-function getCurrentSession(){
+function getCurrentSession() {
+  if (!sessions[currentId]) saveSessions(); // safety net
   return sessions[currentId];
 }
 
-function saveMessage(role,content){
-  getCurrentSession().messages.push({role,content});
+function saveMessage(role, content) {
+  const session = getCurrentSession();
+  session.messages.push({ role, content });
+  session.timestamp = Date.now(); // update timestamp for sorting
   saveSessions();
 }
+
+/* ===== IMPORT FIX ===== */
+function handleImport(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const imported = JSON.parse(ev.target.result);
+      if (confirm("Import chats? This will merge with existing chats.")) {
+        // dedupe IDs to prevent overwriting
+        for (const id in imported) {
+          if (!sessions[id]) sessions[id] = imported[id];
+          else {
+            const newId = Date.now().toString() + Math.floor(Math.random() * 1000);
+            imported[id].id = newId;
+            sessions[newId] = imported[id];
+          }
+        }
+        saveSessions();
+        alert("✅ Chats imported successfully!");
+      }
+    } catch {
+      alert("❌ Invalid file format!");
+    }
+  };
+  reader.readAsText(file);
+}
+
 
 function updateTitle(){
   const session=getCurrentSession();
@@ -1012,6 +1058,7 @@ updateHeaderTitle();
 </script>
 </body>
 </html>
+
 
 
 
