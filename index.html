@@ -913,6 +913,24 @@ function streamBot(text){
       d.remove();
     }
   },15);
+  
+  async function streamBotInChunks(fullText, chunkSize = 500) {
+  const d = document.createElement("div");
+  d.className = "msg bot";
+  chat.appendChild(d);
+
+  let renderedText = "";
+  for (let i = 0; i < fullText.length; i += chunkSize) {
+    const chunk = fullText.slice(i, i + chunkSize);
+    renderedText += chunk; // previous + new chunk
+    d.innerHTML = marked.parse(preprocess(renderedText));
+    chat.scrollTop = chat.scrollHeight;
+    await new Promise(r => setTimeout(r, 15)); // mimic typing speed
+  }
+
+  // Save the full bot message once done
+  saveMessage("bot", fullText);
+}
 }
 
 /* ===== SEND ===== */
@@ -944,7 +962,7 @@ async function send() {
       return;
     }
 
-    streamBot(answer);
+    await streamBotInChunks(answer);
 
   } catch (err) {
     loading.remove();
@@ -970,6 +988,7 @@ updateHeaderTitle();
 
 </body>
 </html>
+
 
 
 
