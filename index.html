@@ -130,6 +130,18 @@ body{
 .history-item .title{
   flex:1;overflow:hidden;
   text-overflow:ellipsis;white-space:nowrap;
+  cursor:text;
+}
+
+.title-input{
+  flex:1;
+  background:transparent;
+  border:1px solid var(--border);
+  color:inherit;
+  padding:2px 6px;
+  border-radius:4px;
+  font-size:14px;
+  outline:none;
 }
 
 .history-item-actions{
@@ -422,16 +434,50 @@ function updateTitle(){
 }
 
 function updateHeaderTitle(){
-  headerTitle.textContent=getCurrentSession().title;
+  const existingTitle=document.getElementById("headerTitle");
+  if(existingTitle){
+    existingTitle.textContent=getCurrentSession().title;
+  }
 }
 
 function editTitle(){
   const session=getCurrentSession();
-  const newTitle=prompt("Rename chat:",session.title);
-  if(newTitle&&newTitle.trim()){
-    session.title=newTitle.trim();
-    saveSessions();
-  }
+  const currentTitle=session.title;
+  
+  const input=document.createElement("input");
+  input.type="text";
+  input.className="title-edit";
+  input.value=currentTitle;
+  
+  headerTitle.replaceWith(input);
+  input.focus();
+  input.select();
+  
+  const save=()=>{
+    const newTitle=input.value.trim();
+    if(newTitle){
+      session.title=newTitle;
+      saveSessions();
+    }
+    
+    const span=document.createElement("span");
+    span.id="headerTitle";
+    span.textContent=session.title;
+    span.ondblclick=editTitle;
+    input.replaceWith(span);
+  };
+  
+  input.onblur=save;
+  input.onkeydown=(e)=>{
+    if(e.key==="Enter"){
+      e.preventDefault();
+      save();
+    }
+    if(e.key==="Escape"){
+      input.value=currentTitle;
+      save();
+    }
+  };
 }
 
 /* ===== TIMESTAMP GROUPING ===== */
@@ -497,6 +543,10 @@ function renderHistory(){
       const title=document.createElement("span");
       title.className="title";
       title.textContent=s.title;
+      title.ondblclick=(e)=>{
+        e.stopPropagation();
+        editChatTitle(s.id,title,div);
+      };
       
       const actions=document.createElement("div");
       actions.className="history-item-actions";
@@ -540,6 +590,56 @@ function renderHistory(){
 function togglePin(id){
   sessions[id].pinned=!sessions[id].pinned;
   saveSessions();
+}
+
+function editChatTitle(id,titleSpan,parentDiv){
+  const session=sessions[id];
+  const oldTitle=session.title;
+  
+  const input=document.createElement("input");
+  input.type="text";
+  input.className="title-input";
+  input.value=oldTitle;
+  
+  // Stop propagation to prevent chat switching
+  input.onclick=(e)=>e.stopPropagation();
+  
+  titleSpan.replaceWith(input);
+  input.focus();
+  input.select();
+  
+  const save=()=>{
+    const newTitle=input.value.trim();
+    if(newTitle&&newTitle!==oldTitle){
+      session.title=newTitle;
+      if(id===currentId){
+        updateHeaderTitle();
+      }
+      saveSessions();
+    }
+    
+    const newSpan=document.createElement("span");
+    newSpan.className="title";
+    newSpan.textContent=session.title;
+    newSpan.ondblclick=(e)=>{
+      e.stopPropagation();
+      editChatTitle(id,newSpan,parentDiv);
+    };
+    input.replaceWith(newSpan);
+  };
+  
+  input.onblur=save;
+  input.onkeydown=(e)=>{
+    e.stopPropagation(); // Prevent any parent handlers
+    if(e.key==="Enter"){
+      e.preventDefault();
+      input.blur();
+    }
+    if(e.key==="Escape"){
+      input.value=oldTitle;
+      input.blur();
+    }
+  };
 }
 
 function newChat(){
