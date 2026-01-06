@@ -1152,22 +1152,16 @@ checkLock();
 
 
 </script>
-  <div id="passModal" class="lock-screen hidden">
+  <!-- Set Pass Modal -->
+<div id="setPassModal" class="lock-screen hidden">
   <div class="lock-card">
     <h2>🔑 Set New Passphrase</h2>
-    <input id="newPassInput" type="password" placeholder="Enter new passphrase" />
-    <input id="confirmPassInput" type="password" placeholder="Confirm passphrase" />
-    <button onclick="setNewPass()">Save</button>
-    <p id="passError"></p>
-    <button onclick="closePassModal()" style="margin-top:10px;background:#ef4444;">Cancel</button>
+    <input id="lockPassNew" type="password" placeholder="•••••••">
+    <input id="lockPassConfirm" type="password" placeholder="•••••••">
+    <button onclick="unlockLockScreen()">Unlock</button>
+    <p id="lockPassError"></p>
+    <button onclick="closeSetPassModal()">Cancel</button>
   </div>
 </div>
 </body>
 </html>
-
-
-
-
-
-
-
