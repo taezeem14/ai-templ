@@ -1105,23 +1105,29 @@ getCurrentSession().messages.forEach(m=>render(m.role,m.content,false));
 renderHistory();
 updateHeaderTitle();
 
-  // ===== NEW LOCK SYSTEM =====
 const LOCK_KEY = "hackoai_lock_enabled";
 const PASS_KEY = "hackoai_passphrase";
 
+const setPassModal = document.getElementById("setPassModal");
+const lockPassNew = document.getElementById("lockPassNew");
+const lockPassConfirm = document.getElementById("lockPassConfirm");
+const lockPassError = document.getElementById("lockPassError");
+const savePassBtn = document.getElementById("savePassBtn");
+
+// Check lock on load
 function checkLock() {
   const lockScreen = document.getElementById("lockScreen");
   const savedPass = localStorage.getItem(PASS_KEY);
   const lockEnabled = localStorage.getItem(LOCK_KEY) === "true";
 
-  if(lockEnabled && savedPass){
+  if (lockEnabled && savedPass) {
     lockScreen.classList.remove("hidden");
   } else {
     lockScreen.classList.add("hidden");
   }
 }
 
-// Unlock button
+// Unlock button (in lock screen)
 function unlockLockScreen(){
   const input = document.getElementById("lockInput");
   const error = document.getElementById("lockError");
@@ -1136,20 +1142,43 @@ function unlockLockScreen(){
   }
 }
 
-// Set new pass in-app
-function setNewPass(){
-  const newPass = prompt("Enter new passphrase:");
-  if(newPass){
-    localStorage.setItem(PASS_KEY, newPass);
-    localStorage.setItem(LOCK_KEY, "true");
-    alert("✅ Passphrase set!");
-    checkLock();
-  }
+// Open modal to set new pass
+function setNewPass() {
+  lockPassNew.value = "";
+  lockPassConfirm.value = "";
+  lockPassError.textContent = "";
+  setPassModal.classList.remove("hidden");
 }
+
+// Close modal
+function closeSetPassModal() {
+  setPassModal.classList.add("hidden");
+}
+
+// Save new pass from modal
+savePassBtn.onclick = () => {
+  const pass = lockPassNew.value.trim();
+  const confirmPass = lockPassConfirm.value.trim();
+
+  if (!pass || !confirmPass) {
+    lockPassError.textContent = "❌ Fill both fields!";
+    return;
+  }
+
+  if (pass !== confirmPass) {
+    lockPassError.textContent = "❌ Passphrases do not match!";
+    return;
+  }
+
+  localStorage.setItem(PASS_KEY, pass);
+  localStorage.setItem(LOCK_KEY, "true");
+  alert("✅ Passphrase set!");
+  closeSetPassModal();
+  checkLock();
+};
 
 // Run on page load
 checkLock();
-
 
 </script>
   <!-- Set Pass Modal -->
@@ -1158,10 +1187,11 @@ checkLock();
     <h2>🔑 Set New Passphrase</h2>
     <input id="lockPassNew" type="password" placeholder="•••••••">
     <input id="lockPassConfirm" type="password" placeholder="•••••••">
-    <button onclick="unlockLockScreen()">Unlock</button>
+    <button id="savePassBtn">Save</button>
     <p id="lockPassError"></p>
     <button onclick="closeSetPassModal()">Cancel</button>
   </div>
 </div>
 </body>
 </html>
+
