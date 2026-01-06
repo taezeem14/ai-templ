@@ -1027,73 +1027,55 @@ async function send() {
   input.value = "";
   charCounter.textContent = "0 chars";
 
-  const isImage = prompt.startsWith("/img "); // image command
-  if (isImage) prompt = prompt.slice(5); // remove /img
+  const isImage = prompt.startsWith("/img "); 
+  if (isImage) prompt = prompt.slice(5); 
 
-  // Render user message
   render("user", prompt);
-
-  // Render loading spinner
   const loading = render("bot", "<div class='spinner'></div>", false);
 
-  if (isImage) {
-    // DALL-E image generation
-    puter.ai.txt2img(prompt, { model: "dall-e-3", quality: "hd" })
-      .then(img => {
-        loading.remove();
-
-        const div = document.createElement("div");
-        div.className = "msg bot";
-
-        const title = document.createElement("strong");
-        title.textContent = "DALL-E 3 Output";
-        div.appendChild(title);
-
-        img.classList.add("ai-img");
-        div.appendChild(img);
-
-        const t = document.createElement("div");
-        t.className = "timestamp";
-        t.textContent = time();
-        div.appendChild(t);
-
-        chat.appendChild(div);
-        chat.scrollTop = chat.scrollHeight;
-
-        saveMessage("bot", "[DALL-E 3 Image]");
-      })
-      .catch(err => {
-        loading.remove();
-        console.error(err);
-        render("bot", "**Error generating image 💀**");
-      });
-  } else {
-    // NORMAL DeepSeek chat (Netlify backend)
-    try {
+  try {
+    if (isImage) {
+      // Image generation
+      puter.ai.txt2img(prompt, { model: "dall-e-3", quality: "hd" })
+        .then(img => {
+          loading.remove();
+          const div = document.createElement("div");
+          div.className = "msg bot";
+          img.classList.add("ai-img");
+          div.appendChild(img);
+          const t = document.createElement("div");
+          t.className = "timestamp";
+          t.textContent = time();
+          div.appendChild(t);
+          chat.appendChild(div);
+          chat.scrollTop = chat.scrollHeight;
+          saveMessage("bot", "[DALL-E 3 Image]");
+        })
+        .catch(err => {
+          loading.remove();
+          console.error(err);
+          render("bot", "**Error generating image 💀**");
+        });
+    } else {
+      // Text via DeepSeek
       const res = await fetch("/.netlify/functions/hackoAI", {
         method: "POST",
-        headers: {"Content-Type":"application/json"},
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: prompt })
       });
 
       const data = await res.json();
       loading.remove();
 
-      // Stream bot response if you want typewriter
-      if (data.response) {
-        streamBotInChunks(data.response);
-      } else {
-        render("bot", "**No response from AI 💀**");
-      }
-    } catch (err) {
-      loading.remove();
-      console.error(err);
-      render("bot", "**Error connecting to DeepSeek 💀**");
+      const answer = data.choices?.[0]?.message?.content || "💀 Empty response from DeepSeek";
+      await streamBotInChunks(answer);
     }
+  } catch (err) {
+    loading.remove();
+    console.error(err);
+    render("bot", "**Network error 💀**");
   }
 }
-
-
 
 function toggleTheme() {
   document.body.classList.toggle("dark");
@@ -1111,6 +1093,7 @@ updateHeaderTitle();
 </script>
 </body>
 </html>
+
 
 
 
