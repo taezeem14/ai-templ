@@ -9,6 +9,7 @@
 <link rel="manifest" href="/site.webmanifest">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<script src="https://js.puter.com/v2/"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
 <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
@@ -1028,46 +1029,26 @@ async function send() {
 
   try {
     if (isImage) {
-      // ====== IMAGE GENERATION via SubNP ======
-      const res = await fetch("/.netlify/functions/generateImage", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ prompt })
-});
-      const reader = response.body
-        .pipeThrough(new TextDecoderStream())
-        .getReader();
+  puter.ai.txt2img(prompt, { model: "dall-e-3", quality: "hd" })
+    .then(img => {
+      loading.remove();
+      const div = document.createElement("div");
+      div.className = "msg bot";
+      div.innerHTML = `<h3>DALL-E 3 Output</h3>`;
+      div.appendChild(img);
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
 
-      let buffer = "";
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += value;
-
-        const lines = buffer.split("\n");
-        buffer = lines.pop(); // keep partial line
-
-        for (let line of lines) {
-          if (!line.startsWith("data: ")) continue;
-          const data = JSON.parse(line.slice(6));
-
-          switch (data.status) {
-            case "processing":
-              console.log("Progress:", data.message);
-              break;
-            case "complete":
-              loading.remove();
-              render("bot", `<img src="${data.imageUrl}" alt="AI Image" />`);
-              break;
-            case "error":
-              loading.remove();
-              render("bot", `**Error:** ${data.message}`);
-              break;
-          }
-        }
-      }
-
-    } else {
+      // Save to session
+      saveMessage("bot", "[DALL-E 3 Image]");
+    })
+    .catch(err => {
+      loading.remove();
+      console.error(err);
+      render("bot", "**Error generating image 💀**");
+    });
+}
+ else {
       // ====== TEXT CHAT via DeepSeek ======
       const res = await fetch("/.netlify/functions/hackoAI", {
         method: "POST",
@@ -1108,6 +1089,7 @@ updateHeaderTitle();
 </script>
 </body>
 </html>
+
 
 
 
