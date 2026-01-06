@@ -374,6 +374,13 @@ body.dark #chat::-webkit-scrollbar-thumb {background-color: #2563eb;border: 2px 
     max-width: 100%;
 }
 }
+  .bot img.ai-img {
+  max-width: 100%;      /* never overflow chat width */
+  border-radius: 12px;  /* match msg bubble */
+  margin-top: 8px;       /* spacing inside bubble */
+  display: block;
+}
+
 </style>
 </head>
 
@@ -1032,14 +1039,31 @@ async function send() {
   puter.ai.txt2img(prompt, { model: "dall-e-3", quality: "hd" })
     .then(img => {
       loading.remove();
+
+      // Create a proper chat msg div for bot
       const div = document.createElement("div");
       div.className = "msg bot";
-      div.innerHTML = `<h3>DALL-E 3 Output</h3>`;
+
+      // Heading + image inside the bubble
+      const title = document.createElement("strong");
+      title.textContent = "DALL-E 3 Output";
+      div.appendChild(title);
+
+      // Add the img element with proper class
+      img.classList.add("ai-img");
       div.appendChild(img);
+
+      // Timestamp
+      const t = document.createElement("div");
+      t.className = "timestamp";
+      t.textContent = time();
+      div.appendChild(t);
+
+      // Append to chat and scroll
       chat.appendChild(div);
       chat.scrollTop = chat.scrollHeight;
 
-      // Save to session
+      // Save placeholder in session
       saveMessage("bot", "[DALL-E 3 Image]");
     })
     .catch(err => {
@@ -1048,29 +1072,6 @@ async function send() {
       render("bot", "**Error generating image 💀**");
     });
 }
- else {
-      // ====== TEXT CHAT via DeepSeek ======
-      const res = await fetch("/.netlify/functions/hackoAI", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: prompt })
-      });
-
-      const data = await res.json();
-      loading.remove();
-
-      const answer = data.choices?.[0]?.message?.content || "💀 Empty response from DeepSeek";
-      await streamBotInChunks(answer);
-    }
-
-  } catch (err) {
-    loading.remove();
-    console.error(err);
-    render("bot", "**Network error 💀**");
-  }
-}
-
-
 
 
 function toggleTheme() {
@@ -1089,6 +1090,7 @@ updateHeaderTitle();
 </script>
 </body>
 </html>
+
 
 
 
