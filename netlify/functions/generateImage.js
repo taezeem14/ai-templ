@@ -9,14 +9,13 @@ export async function handler(event) {
       return { statusCode: 400, body: JSON.stringify({ error: "Empty prompt" }) };
     }
 
-    const subnpRes = await fetch("https://subnp.com/api/free/generate", {
+    const subnpRes = await fetch("https://hackoai-img.tariqmtaezeem.workers.dev", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
         prompt: prompt,
-        model: "turbo"
       })
     });
 
