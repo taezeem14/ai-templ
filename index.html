@@ -1021,7 +1021,7 @@ async function send() {
   const loading = render("bot", "<div class='spinner'></div>", false);
 
   try {
-    const res = await fetch("/.netlify/functions/hackoAI", {
+    const res = await fetch("https://hackoai.netlify.com/.netlify/functions/hackoAI", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text: prompt })
@@ -1058,6 +1058,7 @@ updateHeaderTitle();
 </script>
 </body>
 </html>
+
 
 
 
