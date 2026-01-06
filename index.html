@@ -1027,12 +1027,11 @@ async function send() {
   try {
     if (isImage) {
       // ====== IMAGE GENERATION via SubNP ======
-      const response = await fetch("/.netlify/functions/generateImage", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: prompt, model: "turbo" })
-      });
-
+      const res = await fetch("/.netlify/functions/generateImage", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ prompt })
+});
       const reader = response.body
         .pipeThrough(new TextDecoderStream())
         .getReader();
@@ -1107,6 +1106,7 @@ updateHeaderTitle();
 </script>
 </body>
 </html>
+
 
 
 
