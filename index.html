@@ -459,7 +459,7 @@ body.dark #chat::-webkit-scrollbar-thumb {background-color: #2563eb;border: 2px 
         <span id="headerTitle" ondblclick="editTitle()">HackoAI</span>
       </div>
       <div class="controls">
-        <button class="toggle" onclick="openPassModal()">🔒 Set Pass</button>
+        <button class="toggle" onclick="setNewPass()">🔑 Set Pass</button>
         <button class="toggle" onclick="exportChat()">💾</button>
         <button class="toggle" onclick="copyAll()">📋</button>
         <button class="toggle" onclick="clearChat()">🗑️</button>
@@ -1113,39 +1113,51 @@ getCurrentSession().messages.forEach(m=>render(m.role,m.content,false));
 renderHistory();
 updateHeaderTitle();
 
-  function openPassModal(){
-  document.getElementById("passModal").classList.remove("hidden");
-  document.getElementById("newPassInput").value = "";
-  document.getElementById("confirmPassInput").value = "";
-  document.getElementById("passError").textContent = "";
+  // ===== NEW LOCK SYSTEM =====
+const LOCK_KEY = "hackoai_lock_enabled";
+const PASS_KEY = "hackoai_passphrase";
+
+function checkLock() {
+  const lockScreen = document.getElementById("lockScreen");
+  const savedPass = localStorage.getItem(PASS_KEY);
+  const lockEnabled = localStorage.getItem(LOCK_KEY) === "true";
+
+  if(lockEnabled && savedPass){
+    lockScreen.classList.remove("hidden");
+  } else {
+    lockScreen.classList.add("hidden");
+  }
 }
 
-function closePassModal(){
-  document.getElementById("passModal").classList.add("hidden");
+// Unlock button
+function unlockLockScreen(){
+  const input = document.getElementById("lockInput");
+  const error = document.getElementById("lockError");
+  const saved = localStorage.getItem(PASS_KEY);
+
+  if(input.value === saved){
+    document.getElementById("lockScreen").classList.add("hidden");
+    input.value = "";
+    error.textContent = "";
+  } else {
+    error.textContent = "❌ Wrong passphrase";
+  }
 }
 
+// Set new pass in-app
 function setNewPass(){
-  const newPass = document.getElementById("newPassInput").value.trim();
-  const confirmPass = document.getElementById("confirmPassInput").value.trim();
-  const error = document.getElementById("passError");
-
-  if(!newPass || !confirmPass){
-    error.textContent = "❌ Both fields are required";
-    return;
+  const newPass = prompt("Enter new passphrase:");
+  if(newPass){
+    localStorage.setItem(PASS_KEY, newPass);
+    localStorage.setItem(LOCK_KEY, "true");
+    alert("✅ Passphrase set!");
+    checkLock();
   }
-
-  if(newPass !== confirmPass){
-    error.textContent = "❌ Passphrases do not match";
-    return;
-  }
-
-  // Save new pass
-  localStorage.setItem("hackoai_passphrase", newPass);
-  localStorage.setItem("hackoai_lock_enabled", "true");
-  error.textContent = "✅ Passphrase set!";
-  
-  setTimeout(closePassModal, 1000);
 }
+
+// Run on page load
+checkLock();
+
 
 </script>
   <div id="passModal" class="lock-screen hidden">
@@ -1160,6 +1172,7 @@ function setNewPass(){
 </div>
 </body>
 </html>
+
 
 
 
