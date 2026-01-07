@@ -1044,7 +1044,7 @@ async function send() {
  try {
     if (isImage) {
       // Image generation
-      puter.ai.txt2img(prompt, { model: "google/imagen-4.0-fast", provider: "together-ai", disable_safety_checker: true })
+      puter.ai.txt2img(prompt, { model: "openrouter:google/gemini-2.5-flash-image-preview:free" })
         .then(img => {
           loading.remove();
           const div = document.createElement("div");
@@ -1113,3 +1113,4 @@ updateHeaderTitle();
 </script>
 </body>
 </html>
+
