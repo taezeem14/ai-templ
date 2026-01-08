@@ -920,29 +920,18 @@ function preprocess(text){
 function render(role,content,saveIt=true){
   const d=document.createElement("div");
   d.className="msg "+role;
-  if (content.startsWith("data:image/")) {
-  const imgEl = document.createElement("img");
-  imgEl.src = content;
-  imgEl.className = "ai-img";
-  d.appendChild(imgEl);
-
-} else if (
-  content.endsWith(".mp4") ||
-  content.endsWith(".webm") ||
-  content.includes("blob:")
-) {
+  if (typeof content === "object" && content.type === "video") {
   const video = document.createElement("video");
-  video.src = content;
+  video.src = content.src;
   video.controls = true;
+  video.autoplay = true;
   video.loop = true;
   video.style.maxWidth = "100%";
   video.style.borderRadius = "12px";
   d.appendChild(video);
-
-} else {
+} else if (typeof content === "string") {
   d.innerHTML = marked.parse(preprocess(content));
 }
-
   
   // Add message actions for user messages
   if(role==="user"){
@@ -1112,13 +1101,15 @@ async function send() {
       video.style.borderRadius = "12px";
 
       const div = document.createElement("div");
-      div.className = "msg bot";
-      div.appendChild(video);
-      div.appendChild(timestampEl());
-      chat.appendChild(div);
-      chat.scrollTop = chat.scrollHeight;
+div.className = "msg bot";
 
-      saveMessage("bot", video.src);
+div.appendChild(video);
+chat.appendChild(div);
+chat.scrollTop = chat.scrollHeight;
+
+// Save video as object instead of string
+saveMessage("bot", { type: "video", src: video.src });
+
     }
 
     /* ================= TEXT ================= */
@@ -1162,6 +1153,7 @@ updateHeaderTitle();
 </script>
 </body>
 </html>
+
 
 
 
