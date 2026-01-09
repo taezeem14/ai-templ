@@ -59,8 +59,6 @@ body{
   transition:transform 0.3s ease;
 }
 
-.sidebar.hidden{transform:translateX(-100%);}
-
 .sidebar-header{
   padding:14px 16px;
   border-bottom:1px solid var(--border);
@@ -820,7 +818,7 @@ function clearChat(){
 }
 
 function toggleSidebar(){
-  sidebar.classList.toggle("hidden");
+  sidebar.classList.toggle("show");
 }
 /* ===== EXPORT/IMPORT ===== */
 function exportChat(){
@@ -1166,6 +1164,7 @@ updateHeaderTitle();
 </script>
 </body>
 </html>
+
 
 
 
