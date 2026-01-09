@@ -59,6 +59,8 @@ body{
   transition:transform 0.3s ease;
 }
 
+.sidebar.hidden{transform:translateX(-100%);}
+
 .sidebar-header{
   padding:14px 16px;
   border-bottom:1px solid var(--border);
@@ -477,11 +479,8 @@ const headerTitle=document.getElementById("headerTitle");
 const SESSIONS_KEY = "hackoai_sessions";
 const CURRENT_KEY = "hackoai_current";
 
-// 👻 short-term memory
-let currentId =
-  sessionStorage.getItem(CURRENT_KEY) ||
-  localStorage.getItem(CURRENT_KEY) ||
-  null;
+let sessions = loadSessions();
+let currentId = localStorage.getItem(CURRENT_KEY) || null;
 
 function loadSessions() {
   try {
@@ -509,11 +508,7 @@ function saveSessions() {
   }
 
   localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
-
-// 🔥 store current chat in BOTH
-sessionStorage.setItem(CURRENT_KEY, currentId);
-localStorage.setItem(CURRENT_KEY, currentId);
-
+  localStorage.setItem(CURRENT_KEY, currentId);
   renderHistory();
   updateHeaderTitle();
 }
@@ -562,7 +557,7 @@ function handleImport(e) {
 
 function updateTitle(){
   const session=getCurrentSession();
-    if(session.messages.length===1&&session.title==="New Chat"){
+  if(session.messages.length===1&&session.title==="New Chat"){
     const firstMsg=session.messages[0].content;
     session.title=firstMsg.slice(0,30)+(firstMsg.length>30?"...":"");
     saveSessions();
@@ -652,11 +647,7 @@ function renderHistory(){
   if(query){
     filtered=filtered.filter(s=>
       s.title.toLowerCase().includes(query)||
-      s.messages.some(m =>
-  typeof m.content === "string" &&
-  m.content.toLowerCase().includes(query)
-)
-
+      s.messages.some(m=>m.content.toLowerCase().includes(query))
     );
   }
   
@@ -784,7 +775,6 @@ function editChatTitle(id,titleSpan,parentDiv){
 
 function newChat(){
   currentId=Date.now().toString();
-  sessionStorage.setItem(CURRENT_KEY, currentId); // 👈 HERE
   sessions[currentId]={
     id:currentId,
     title:"New Chat",
@@ -798,8 +788,7 @@ function newChat(){
 
 function loadChat(id){
   currentId=id;
-  sessionStorage.setItem(CURRENT_KEY, currentId);
-localStorage.setItem(CURRENT_KEY, currentId);
+  localStorage.setItem(CURRENT_KEY,currentId);
   chat.innerHTML="";
   getCurrentSession().messages.forEach(m=>render(m.role,m.content,false));
   renderHistory();
@@ -1045,7 +1034,6 @@ async function streamBotInChunks(fullText, chunkSize = 50) {
     localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
 
     await new Promise(r => setTimeout(r, 15));
-    d.appendChild(timestampEl());
   }
 }
 
@@ -1165,13 +1153,3 @@ updateHeaderTitle();
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
