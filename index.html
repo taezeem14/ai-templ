@@ -53,13 +53,19 @@ body{
 
 /* ===== SIDEBAR ===== */
 .sidebar{
-  width:260px;background:var(--sidebar);
+  width:260px;
+  background:var(--sidebar);
   border-right:1px solid var(--border);
-  display:flex;flex-direction:column;
-  transition:transform 0.3s ease;
+  display:flex;
+  flex-direction:column;
+  position: relative;
+  transition: transform 0.3s ease;
 }
 
-.sidebar.hidden{transform:translateX(-100%);}
+  /* hidden state (ALL screens) */
+.sidebar.hidden{
+  transform: translateX(-100%);
+}
 
 .sidebar-header{
   padding:14px 16px;
@@ -350,14 +356,12 @@ body.dark #chat::-webkit-scrollbar-thumb {background-color: #2563eb;border: 2px 
 
 /* ===== MOBILE ===== */
 @media(max-width:768px){
-  .sidebar {
-    position: absolute; /* 🔥 THIS FIXES IT */
-    z-index: 20;       /* higher than other content */
-    height: 100%;
-    top: 0;
-    left: 0;
-    transform: translateX(-100%); /* hidden by default */
-    transition: transform 0.3s ease;
+  .sidebar{
+    position:absolute;
+    top:0;
+    left:0;
+    height:100%;
+    z-index:20;
   }
   .sidebar.show {      /* class to toggle */
     transform: translateX(0);
@@ -904,13 +908,7 @@ function clearChat(){
 }
 
 function toggleSidebar(){
-  sidebar.classList.toggle("show");
-  // optional for desktop: hide completely
-  if (!sidebar.classList.contains("show") && window.innerWidth > 768) {
-    sidebar.style.display = "none";
-  } else {
-    sidebar.style.display = "";
-  }
+  sidebar.classList.toggle("hidden");
 }
 /* ===== EXPORT/IMPORT ===== */
 function exportChat(){
@@ -1267,6 +1265,7 @@ updateHeaderTitle();
 </script>
 </body>
 </html>
+
 
 
 
