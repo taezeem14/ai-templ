@@ -59,7 +59,7 @@ body{
   display:flex;
   flex-direction:column;
   position: relative;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, width 0.3s ease;
 }
 
 
@@ -565,6 +565,8 @@ const searchBox=document.getElementById("searchBox");
 const scrollBottom=document.getElementById("scrollBottom");
 const charCounter=document.getElementById("charCounter");
 const headerTitle=document.getElementById("headerTitle");
+const PREPOPUP_KEY = "hackoai_prepopup_clicked";
+
 
 /* ===== SESSION MANAGEMENT ===== */
 /* ===== STORAGE HELPERS ===== */
@@ -1139,7 +1141,12 @@ async function streamBotInChunks(fullText, chunkSize = 50) {
 }
   const prePopup = document.getElementById("prePopup");
 const goToPuter = document.getElementById("goToPuter");
-
+  
+  // check popup state on load
+if (localStorage.getItem(PREPOPUP_KEY) === "true") {
+  prePopup.style.display = "none";
+}
+  
 goToPuter.addEventListener("click", () => {
   // hide the popup immediately
   prePopup.style.display = "none"; // or prePopup.remove();
@@ -1209,7 +1216,6 @@ if (isImage) {
         model: "sora-2-pro",
         seconds: 8,
         size: "1280x720"
-        // pro: ByteDance/Seedance-1.0-pro
       });
 
       loading.remove();
@@ -1273,6 +1279,7 @@ updateHeaderTitle();
 </script>
 </body>
 </html>
+
 
 
 
