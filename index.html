@@ -1129,11 +1129,15 @@ async function streamBotInChunks(fullText, chunkSize = 50) {
 const goToPuter = document.getElementById("goToPuter");
 
 goToPuter.addEventListener("click", () => {
+  // hide the popup immediately
+  prePopup.style.display = "none"; // or prePopup.remove();
+
+  // optional: enable chat interactions after hiding
+  chat.style.pointerEvents = "auto";
+
+  // redirect (or you can remove this if you just want to stay)
   window.location.href = "https://puter.com/dashboard";
 });
-
-// Optional: prevent chat load until popup gone
-// This already blocks interaction because of z-index & fullscreen overlay
 
 // SEND function for DeepSeek
 async function send() {
@@ -1255,6 +1259,7 @@ updateHeaderTitle();
 </script>
 </body>
 </html>
+
 
 
 
