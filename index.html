@@ -1148,13 +1148,16 @@ if (localStorage.getItem(PREPOPUP_KEY) === "true") {
 }
   
 goToPuter.addEventListener("click", () => {
-  // hide the popup immediately
-  prePopup.style.display = "none"; // or prePopup.remove();
+  // remember that user clicked it
+  localStorage.setItem(PREPOPUP_KEY, "true");
 
-  // optional: enable chat interactions after hiding
+  // hide popup
+  prePopup.style.display = "none";
+
+  // enable interactions if needed
   chat.style.pointerEvents = "auto";
 
-  // redirect (or you can remove this if you just want to stay)
+  // redirect
   window.open("https://puter.com/dashboard", "_blank");
 });
 
@@ -1279,6 +1282,7 @@ updateHeaderTitle();
 </script>
 </body>
 </html>
+
 
 
 
