@@ -572,30 +572,36 @@ body.dark #chat::-webkit-scrollbar-thumb {background-color: #2563eb;border: 2px 
   text-overflow: ellipsis;
 }
 
-#imageInput {
-  position: relative;
-  padding: 0 16px;
-  border-radius: 8px;
-  border: none;
-  background: #10b981;
+#imageBtn {
+  background: linear-gradient(135deg, #10b981, #059669);
   color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
+  font-size: 16px;
 }
 
-#imageInput:hover {
-  background: #059669;
+#imageBtn:hover {
+  background: linear-gradient(135deg, #059669, #10b981);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(16,185,129,0.4);
 }
 
-#imageInput.recording {
+#imageBtn.recording {
   background: #ef4444;
   animation: pulse 1.5s infinite;
 }
 
-#imageInput.disabled {
+#imageBtn.disabled {
   background: var(--border);
   cursor: not-allowed;
+}
+
+#imageInput {
+  display: none; /* keep hidden, used only for file picker */
 }
 
 /* ===== MOBILE OPTIMIZED ===== */
@@ -731,31 +737,38 @@ body.dark #chat::-webkit-scrollbar-thumb {background-color: #2563eb;border: 2px 
 	box-shadow: 0 10px 30px rgba(37,99,235,0.5);
   }
 
-#imageInput {
-  position: relative;
-  padding: 0 16px;
-  border-radius: 8px;
-  border: none;
-  background: ;
+#imageBtn {
+  background: linear-gradient(135deg, #10b981, #059669);
   color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
+  font-size: 16px;
 }
 
-#imageInput:hover {
-  background: #059669;
+#imageBtn:hover {
+  background: linear-gradient(135deg, #059669, #10b981);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(16,185,129,0.4);
 }
 
-#imageInput.recording {
+#imageBtn.recording {
   background: #ef4444;
   animation: pulse 1.5s infinite;
 }
 
-#imageInput.disabled {
+#imageBtn.disabled {
   background: var(--border);
   cursor: not-allowed;
 }
+
+#imageInput {
+  display: none; /* keep hidden, used only for file picker */
+}
+
   .char-counter {
     font-size: 9px;
     padding: 2px 4px;
